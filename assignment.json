@@ -1,0 +1,40 @@
+const fs = require('fs');
+
+const input = JSON.parse(fs.readFileSync('input.json', 'utf8'));
+
+const n = input.keys.n;
+const k = input.keys.k;
+
+let decodedValues = [];
+
+for (let i = 1; i <= n; i++) {
+    const base = parseInt(input[i].base);
+    const value = input[i].value;
+
+    const decodedValue = parseInt(value, base);
+    decodedValues.push({ x: i, y: decodedValue });
+}
+
+function lagrangeInterpolation(points) {
+    let c = 0;
+
+    for (let i = 0; i < points.length; i++) {
+        let xi = points[i].x;
+        let yi = points[i].y;
+
+        let li = 1;
+        for (let j = 0; j < points.length; j++) {
+            if (i !== j) {
+                li *= (0 - points[j].x) / (xi - points[j].x);
+            }
+        }
+        c += li * yi;
+    }
+
+    return Math.round(c);
+}
+
+const selectedPoints = decodedValues.slice(0, k);
+const constantTerm = lagrangeInterpolation(selectedPoints);
+
+console.log("The constant term (c) is:", constantTerm);
